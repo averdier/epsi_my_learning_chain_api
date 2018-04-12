@@ -371,6 +371,13 @@ class Facilitator(User, IOTAAccount):
 
         return Claim.objects(offer__in=oss)
 
+    @property
+    def offers(self):
+        """
+        Return offers
+        """
+        return Offer.objects(facilitator=self)
+
 
 class Student(User):
     """

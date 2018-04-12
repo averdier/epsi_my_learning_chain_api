@@ -50,3 +50,9 @@ file_nested = api.model('File nested', {
     'name': fields.String(required=True, description='Filename'),
     'extension': fields.String(required=True, description='Extension')
 })
+
+claim_nested = api.model('Claim nested', {
+    'id': fields.String(required=True, description='Claim ID'),
+    'offer_id': fields.String(required=True, description='Offer ID', attribute=lambda c: c.offer.id),
+    'status': fields.String(required=True, description='Status')
+})
