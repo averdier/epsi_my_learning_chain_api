@@ -6,7 +6,7 @@ from .. import auth
 from ..serializers.offers import offer_container, offer_post_model, offer_patch_model, offer_model
 from ..serializers.claims import claim_container, claim_model, claim_post_model, claim_put_model
 from ..serializers.messages import message_container, message_post_model, message_minimal_model
-from app.models import Offer, Claim, Group, Facilitator, Message
+from app.models import Offer, Claim, Group, Facilitator, Message, Student
 from utils.iota import make_transfer
 from utils.email import send_mail_with_service
 
@@ -147,10 +147,16 @@ class OfferClaimCollection(Resource):
         """
         Add Claim
         """
+        if g.client.type != 'student':
+            abort(400, error='Not authorized')
+        s = Student.objects.get_or_404(id=g.client.id)
+
         data = request.json
         o = Offer.objects.get_or_404(id=id)
 
         gr = Group.objects.get_or_404(id=data['group'])
+        if s not in gr.students:
+            abort(400, error='Not authorized')
 
         if gr.balance - gr.reserved < o.price:
             abort(400, error='No founds')
