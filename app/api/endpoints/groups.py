@@ -28,11 +28,11 @@ class GroupCollection(Resource):
         """
         Return Groups
         """
-        if 'campus' not in dir(g.client):
-            abort(400, error='You must have campus')
+        if g.client.type != 'student':
+            abort(400, error='Not authorized')
+        s = Student.objects.get_or_404(id=g.client.id)
 
-        prjs = Project.objects(campus=g.client.campus)
-        return {'groups': [gr for gr in Group.objects(project__in=prjs)]}
+        return {'groups': [gr for gr in s.groups]}
 
 
 @ns.route('/<id>')
@@ -45,12 +45,14 @@ class GroupItem(Resource):
         """
         Return Group
         """
-        if 'campus' not in dir(g.client):
-            abort(400, error='You must have campus')
-
         gr = Group.objects.get_or_404(id=id)
 
-        if gr.project.campus != g.client.campus:
+        if g.client.type == 'student':
+            s = Student.objects.get_or_404(id=g.client.id)
+            if s not in gr.students:
+                abort(400, error='Not authorized')
+
+        elif g.client != 'facilitator':
             abort(400, error='Not authorized')
 
         return gr

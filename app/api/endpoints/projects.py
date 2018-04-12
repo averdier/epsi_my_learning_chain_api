@@ -4,7 +4,7 @@ from flask import request, g
 from flask_restplus import Namespace, Resource, abort
 from .. import auth
 from ..serializers.projects import project_resource_model, project_container
-from app.models import Project
+from app.models import Project, Student, Group
 
 ns = Namespace('projects', description='Projects related operations')
 
@@ -27,10 +27,15 @@ class ProjectCollection(Resource):
         """
         Return Projects
         """
-        if 'campus' not in dir(g.client):
-            abort(400, error='You must have campus')
+        if g.client.type != 'student':
+            abort(400, error='Not authorized')
+        s = Student.objects.get_or_404(id=g.client.id)
 
-        return {'projects': [p for p in Project.objects(campus=g.client.campus)]}
+        result = []
+        for gr in s.groups:
+            result.append(gr.project)
+
+        return {'projects': result}
 
 
 @ns.route('/<id>')
@@ -43,12 +48,16 @@ class ProjectItem(Resource):
         """
         Return Project
         """
-        if 'campus' not in dir(g.client):
-            abort(400, error='You must have campus')
-
         p = Project.objects.get_or_404(id=id)
 
-        if p.campus != g.client.campus:
+        if g.client.type == 'student':
+            s = Student.objects.get_or_404(id=g.client.id)
+
+            grs = Group.objects(project=p, students__contains=s)
+            if len(grs) == 0:
+                abort(400, error='Not authorized')
+
+        elif g.client != 'facilitator':
             abort(400, error='Not authorized')
 
         return p
