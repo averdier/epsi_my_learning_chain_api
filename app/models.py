@@ -360,15 +360,16 @@ class Facilitator(User, IOTAAccount):
     """
     Facilitator model
     """
+    tags = db.ListField(db.StringField())
 
     @property
     def claims(self):
         """
         Return claims
         """
-        os = Offer.objects(facilitator=self)
+        oss = Offer.objects(facilitator=self)
 
-        return Claim.objects(offer__in=os)
+        return Claim.objects(offer__in=oss)
 
 
 class Student(User):
