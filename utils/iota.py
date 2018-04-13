@@ -112,3 +112,4 @@ def make_transfer(iota_node, args):
         min_weight_magnitude=9
     )
     print(r)
+
