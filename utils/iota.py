@@ -109,6 +109,6 @@ def make_transfer(iota_node, args):
         depth=7,
         transfers=txn,
         change_address=Address(bytes(args['deposit_address'].encode('utf-8'))),
-        min_weight_magnitude=13
+        min_weight_magnitude=9
     )
     print(r)
