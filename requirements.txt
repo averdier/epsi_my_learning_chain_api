@@ -33,7 +33,7 @@ regex==2018.2.21
 requests==2.18.4
 six==1.11.0
 socketIO-client==0.7.2
-urllib3==1.22
+urllib3==1.26.5
 websocket-client==0.47.0
 Werkzeug==0.14.1
 WTForms==2.1
